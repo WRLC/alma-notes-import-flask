@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Batch update Alma field by barcode</h1>
+    <form method="POST"  enctype="multipart/form-data">
+        {{ form.csrf_token }}
+        <div class="mb-3 required">
+            {{ form.csv.label(class_='form-label') }}<br />{{ form.csv(class_='form-control') }}
+        </div>
+        {% if form.csv.errors %}
+            {% for error in form.csv.errors %}
+                <div class="alert alert-danger" role="alert">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+        <div class="mb-3 required">
+            {{ form.almafield.label(class_='form-label') }}<br />{{ form.almafield(class_='form-control') }}
+        </div>
+        <div class="actions">
+            <input class="btn btn-primary" type="submit" value="Update">
+        </div>
+    </form>
+{% endblock %}
