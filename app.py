@@ -8,6 +8,7 @@ import os
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'secret!'
+app.config['UPLOAD_FOLDER'] = 'static/csv'
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -18,7 +19,7 @@ def upload():
         file = form.csv.data  # Get the CSV file from the form
         filename = secure_filename(file.filename)  # Make the filename safe, even though it should be safe already
         file.save(os.path.join(  # Save the file to the CSV folder in the instance path
-            app.instance_path, 'static/csv', filename
+            app.config['UPLOAD_FOLDER'], filename
         ))
 
         # Field
@@ -26,16 +27,14 @@ def upload():
 
         # Run the batch function on the CSV file
         batch(os.path.join(
-            app.instance_path, 'static/csv', filename
+            app.config['UPLOAD_FOLDER'], filename
         ), field)
 
         # Provide import info as message to user
         flash(
-            'The CSV is being processed. An email will be sent to {} when complete.'.format(user),
+            'The CSV "' + filename + '" is being processed. An email will be sent to {} when complete.'.format(user),
             'info'
         )
-
-        return url_for('upload')  # Redirect to the upload page
 
     return render_template('upload.html', form=form)
 

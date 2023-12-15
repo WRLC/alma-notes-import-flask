@@ -2,8 +2,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from settings import log_dir, sender_email, smtp_address
 import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import email.message
 
 # scheduler log
 logdir = log_dir  # set the log directory
@@ -20,37 +19,18 @@ email_log.addHandler(file_handler)  # add the file handler to the scheduler log
 
 
 def send_email(body, filename, user):
-    message = MIMEMultipart("alternative")  # create message
-    message["Subject"] = 'Results for ', filename  # set subject
+    message = email.message.Message()  # create message
+    message["Subject"] = 'Results for {}'.format(filename)  # set subject
     message["From"] = sender_email  # set sender
-
-    # Create the plain-text and HTML version of your message
-    text = body
-
-    html = """\
-            <html>
-              <body>
-                <div>""" + body + """</div>
-              </body>
-            </html>
-            """
-
-    # Turn these into plain/html MIMEText objects
-    part1 = MIMEText(text, "plain")
-    part2 = MIMEText(html, "html")
-
-    # Add HTML/plain-text parts to MIMEMultipart message
-    # The email client will try to render the last part first
-    message.attach(part1)
-    message.attach(part2)
-
     message["To"] = user  # set recipient
+    message.add_header('Content-Type', 'text')  # set content type
+    message.set_payload(body)  # set body
 
     try:  # try to send email
         smtp = smtplib.SMTP(smtp_address)  # create smtp server
-        smtp.sendmail(sender_email, user, message.as_string())  # send email
+        smtp.sendmail(message['From'], message['To'], message.as_string())  # send email
         smtp.quit()  # quit smtp server
     except Exception as e:  # catch exception
-        email_log.error('Error sending email to {}: {}'.format(user, str(e)))  # log error
+        email_log.error('Error sending email to {}: '.format(user) + '{}'.format(e))  # log error
     else:  # if no exception
-        email_log.info('Email sent to %s' % user)  # log info
+        email_log.info('Email sent to {}'.format(user))  # log info
