@@ -1,7 +1,8 @@
-from flask import Flask, render_template, flash, session, url_for
+from flask import Flask, render_template, flash, url_for
 from forms import UploadForm
 from werkzeug.utils import secure_filename
 from batch import batch
+from settings import user
 import os
 
 app = Flask(__name__)
@@ -30,7 +31,7 @@ def upload():
 
         # Provide import info as message to user
         flash(
-            'The CSV is being processed. An email will be sent when complete.',
+            'The CSV is being processed. An email will be sent to {} when complete.'.format(user),
             'info'
         )
 
