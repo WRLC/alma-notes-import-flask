@@ -1,13 +1,13 @@
-from flask import Flask, render_template, flash, url_for
+from flask import Flask, render_template, flash
 from forms import UploadForm
 from werkzeug.utils import secure_filename
 from batch import batch
-from settings import user
+from settings import user, SECRET_APP_KEY
 import os
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = SECRET_APP_KEY
 app.config['UPLOAD_FOLDER'] = 'static/csv'
 
 
