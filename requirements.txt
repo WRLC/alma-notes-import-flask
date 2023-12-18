@@ -13,6 +13,7 @@ click-plugins==1.1.1
 click-repl==0.3.0
 Flask==3.0.0
 Flask-WTF==1.2.1
+greenlet==3.0.2
 idna==3.6
 importlib-metadata==7.0.0
 itsdangerous==2.1.2

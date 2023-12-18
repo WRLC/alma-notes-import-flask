@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, flash, session
 from celery import Celery
 from forms import UploadForm
 from werkzeug.utils import secure_filename
@@ -9,12 +9,13 @@ import csv
 import chardet
 import requests
 import json
-from settings import ALMA_SERVER, ALMA_API_KEY, user_email, log_dir, SECRET_APP_KEY, sender_email, smtp_address
+from settings import ALMA_SERVER, ALMA_API_KEY, log_dir, SECRET_APP_KEY, sender_email, smtp_address
 import smtplib
 import email.message
 
 app = Flask(__name__)
 
+# app configuration
 app.config['SECRET_KEY'] = SECRET_APP_KEY
 app.config['UPLOAD_FOLDER'] = 'static/csv'
 
@@ -38,6 +39,8 @@ file_handler.setFormatter(  # set the file handler format
         '%(asctime)s %(levelname)-8s %(message)s', datefmt='%m/%d/%Y %H:%M:%S'
     ))
 app_log.addHandler(file_handler)  # add the file handler to the batch log
+
+user_email = session['email']  # Get user email from session
 
 
 @app.route('/', methods=['GET', 'POST'])
