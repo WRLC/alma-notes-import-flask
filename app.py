@@ -27,6 +27,27 @@ app.config['CELERY_RESULT_BACKEND'] = 'redis://127.0.0.1:6379'
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
+
+# set up error handlers & templates for HTTP codes used in abort()
+#   see http://flask.pocoo.org/docs/1.0/patterns/errorpages/
+# 400 error handler
+@app.errorhandler(400)
+def badrequest(e):
+    return render_template('error_400.html', e=e), 400  # render the error template
+
+
+# 403 error handler
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('unauthorized.html', e=e), 403  # render the error template
+
+
+# 500 error handler
+@app.errorhandler(500)
+def internalerror(e):
+    return render_template('error_500.html', e=e), 500  # render the error template
+
+
 # app log
 logdir = log_dir  # set the log directory
 log_file = logdir + '/app.log'  # set the log file
