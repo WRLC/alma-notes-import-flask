@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, PasswordField
+from wtforms import SelectField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import DataRequired
 
 
 class UploadForm(FlaskForm):

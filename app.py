@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, session
+from flask import Flask, render_template, flash, session, redirect, url_for, request, abort
 from celery import Celery
 from forms import UploadForm
 from werkzeug.utils import secure_filename
@@ -9,15 +9,28 @@ import csv
 import chardet
 import requests
 import json
-from settings import ALMA_SERVER, ALMA_API_KEY, log_dir, SECRET_APP_KEY, sender_email, smtp_address
+from settings import ALMA_SERVER, ALMA_API_KEY, log_dir, SECRET_APP_KEY, sender_email, smtp_address, saml_sp, \
+    cookie_issuing_file, institution, site_url, shared_secret, database
 import smtplib
 import email.message
+from functools import wraps
+import jwt
+from models import user_login, db
 
 app = Flask(__name__)
 
 # app configuration
 app.config['SECRET_KEY'] = SECRET_APP_KEY
+app.config['SHARED_SECRET'] = shared_secret
+app.config['SQLALCHEMY_DATABASE_URI'] = database  # set the database URI
 app.config['UPLOAD_FOLDER'] = 'static/csv'
+
+db.init_app(app)  # initialize SQLAlchemy
+
+# database
+with app.app_context():  # need to be in app context to create the database
+    db.create_all()  # create the database
+
 
 # Celery configuration
 app.config['CELERY_BROKER_URL'] = 'redis://127.0.0.1:6379'
@@ -61,11 +74,24 @@ file_handler.setFormatter(  # set the file handler format
     ))
 app_log.addHandler(file_handler)  # add the file handler to the batch log
 
-user_email = session['email']  # Get user email from session
+
+# decorator for pages that need auth
+def auth_required(f):
+    @wraps(f)  # preserve the original function's metadata
+    def decorated(*args, **kwargs):  # the wrapper function
+        if 'username' not in session:  # if the user is not logged in
+            return redirect(url_for('login'))  # redirect to the login page
+        else:
+            return f(*args, **kwargs)  # otherwise, call the original function
+
+    return decorated
 
 
 @app.route('/', methods=['GET', 'POST'])
+@auth_required
 def upload():
+    if 'almanotesimport' not in session['authorizations']:
+        abort(403)
     form = UploadForm()
     if form.validate_on_submit():
         # File
@@ -88,11 +114,51 @@ def upload():
         # Provide import info as message to user
         flash(
             'The CSV "' + filename + '" is being processed (taskid = ' + str(
-                task.id) + '). An email will be sent to {} when complete.'.format(user_email),
+                task.id) + '). An email will be sent to {} when complete.'.format(session['email']),
             'info'
         )
+        return redirect(url_for('upload'))
 
     return render_template('upload.html', form=form)
+
+
+@app.route('/login')
+def login():
+    if 'username' in session:
+        return redirect(url_for('upload'))
+    else:
+        login_url = saml_sp
+        login_url += cookie_issuing_file
+        login_url += '?institution='
+        login_url += institution
+        login_url += '&url='
+        login_url += site_url
+        login_url += '/login/n'
+        return render_template('login.html', login_url=login_url)
+
+
+@app.route('/login/n')
+def new_login():
+    session.clear()
+    if 'wrt' in request.cookies:  # if the login cookie is present
+        encoded_token = request.cookies['wrt']  # get the login cookie
+        user_data = jwt.decode(encoded_token, app.config['SHARED_SECRET'], algorithms=['HS256'])  # decode the token
+        user_login(session, user_data)  # Log the user in
+
+        if 'almanotesimport' in session['authorizations']:  # if the user is an exceptions user
+            return redirect(url_for('upload'))  # redirect to the home page
+        else:
+            abort(403)  # otherwise, abort with a 403 error
+    else:
+        return "no login cookie"  # if the login cookie is not present, return an error
+
+
+# Logout handler
+@app.route('/logout')
+@auth_required
+def logout():
+    session.clear()  # clear the session
+    return redirect(url_for('upload'))  # redirect to the home page
 
 
 @celery.task
@@ -171,7 +237,7 @@ def batch(csvfile, almafield):
     app_log.info('Import complete. ' + str(success) + ' barcodes updated. ' + str(failed) + ' barcodes not updated.')
 
     # Send email to user
-    send_email(emailbody, filename, user_email)
+    send_email(emailbody, filename, session['email'])
 
 
 def send_email(body, filename, useremail):
