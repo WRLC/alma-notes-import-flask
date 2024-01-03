@@ -19,4 +19,28 @@
             <input class="btn btn-primary" type="submit" value="Update">
         </div>
     </form>
+    {% if imports|length > 0 %}
+        <table class="table table-bordered table-hover table-sm report">
+            <thead class="table-dark sticky-top">
+                <tr>
+                    <th>Uploaded</th>
+                    <th>User</th>
+                    <th>File</th>
+                    <th>Field</th>
+                    <th>Status</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            {% for import in imports %}
+                <tr>
+                    <td>{{ import.date }}</td>
+                    <td>{{ import.user }}</td>
+                    <td>{{ import.filename }}</td>
+                    <td>{{ import.field }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 {% endblock %}

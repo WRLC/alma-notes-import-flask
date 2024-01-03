@@ -15,7 +15,7 @@ import smtplib
 import email.message
 from functools import wraps
 import jwt
-from models import user_login, db
+from models import user_login, db, add_batch_import, check_user, get_batch_imports
 
 app = Flask(__name__)
 
@@ -33,11 +33,11 @@ with app.app_context():  # need to be in app context to create the database
 
 
 # Celery configuration
-app.config['CELERY_BROKER_URL'] = 'redis://127.0.0.1:6379'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://127.0.0.1:6379'
+app.config['broker_url'] = 'redis://127.0.0.1:6379'
+app.config['result_backend'] = 'db+' + database
 
 # Initialize Celery
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery = Celery(app.name, broker=app.config['broker_url'])
 celery.conf.update(app.config)
 
 
@@ -96,20 +96,38 @@ def upload():
     if form.validate_on_submit():
         # File
         file = form.csv.data  # Get the CSV file from the form
-        filename = secure_filename(file.filename)  # Make the filename safe, even though it should be safe already
-        file.save(os.path.join(  # Save the file to the CSV folder in the instance path
-            app.config['UPLOAD_FOLDER'], filename
+        filename = secure_filename(file.filename)  # Get the filename from the file
+
+        # If the filename already exists in the upload folder...
+        if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+            name, ext = os.path.splitext(file.filename)  # ...get the filename and extension
+            count = 0  # ...initialize filecount
+            # ...while the filename and filecount exists...
+            while os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], name) + '-{}'.format(count) + ext):
+                count += 1  # ...increment the filecount until the filename doesn't exist
+            filename = name + '-{}'.format(count) + ext  # ...add the new filecount to the filename
+
+        secfilename = secure_filename(filename)  # Make the filename safe, even though it should be safe already
+
+        # Save the file to the CSV folder in the instance path
+        file.save(os.path.join(
+            app.config['UPLOAD_FOLDER'], secfilename
         ))
 
         # Field
         field = form.almafield.data  # Get the Alma field from the form
 
+        user = check_user(session['username'])  # Get the current user object
+
         # Run the batch function on the CSV file
         task = batch.delay(
             os.path.join(
-                app.config['UPLOAD_FOLDER'], filename
-            ), field
+                app.config['UPLOAD_FOLDER'], secfilename
+            ), field, user.emailaddress
         )
+
+        # Add task to database
+        add_batch_import(task.id, filename, field, user.id)
 
         # Provide import info as message to user
         flash(
@@ -119,7 +137,10 @@ def upload():
         )
         return redirect(url_for('upload'))
 
-    return render_template('upload.html', form=form)
+    # Get batch imports from database
+    batch_imports = get_batch_imports()
+
+    return render_template('upload.html', form=form, imports=batch_imports)
 
 
 @app.route('/login')
@@ -162,7 +183,7 @@ def logout():
 
 
 @celery.task
-def batch(csvfile, almafield):
+def batch(csvfile, almafield, useremail):
     filename = csvfile.replace('static/csv', '')  # Set filename for email log
     emailbody = 'Results for {}:\n'.format(filename)  # Initialize email body
     app_log.info('Processing CSV file: ' + filename)  # Log info
@@ -237,7 +258,9 @@ def batch(csvfile, almafield):
     app_log.info('Import complete. ' + str(success) + ' barcodes updated. ' + str(failed) + ' barcodes not updated.')
 
     # Send email to user
-    send_email(emailbody, filename, session['email'])
+    send_email(emailbody, filename, useremail)
+
+    return emailbody  # Return email body for testing
 
 
 def send_email(body, filename, useremail):

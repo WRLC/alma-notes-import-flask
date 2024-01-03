@@ -1,9 +1,15 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.mysql import LONGTEXT
 from datetime import datetime
 
 db = SQLAlchemy()  # Create a database object
 
 
+##################
+# Object Classes #
+##################
+
+# User model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), nullable=False)
@@ -15,7 +21,21 @@ class User(db.Model):
         return '<User %r>' % self.username
 
 
-# Log the user in
+# BatchImport model
+class BatchImport(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(255), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    field = db.Column(db.String(255), nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    user = db.Column(db.String(255), nullable=False)
+
+
+####################
+# Helper functions #
+####################
+
+# Log the user into the application
 def user_login(session, user_data):
 
     # Set the session variables
@@ -67,3 +87,20 @@ def add_user(session,):
     )
     db.session.add(user)  # Add the user to the database
     db.session.commit()  # Commit the changes
+
+
+def add_batch_import(uuid, filename, field, user):
+    batch_import = BatchImport(
+        uuid=uuid,
+        filename=filename,
+        field=field,
+        date=datetime.now(),
+        user=user,
+    )
+    db.session.add(batch_import)  # Add the batch import to the database
+    db.session.commit()  # Commit the changes
+
+
+def get_batch_imports():
+    batch_imports = db.session.execute(db.select(BatchImport).order_by(BatchImport.date.desc())).scalars().all()
+    return batch_imports
