@@ -16,16 +16,17 @@
             {{ form.almafield.label(class_='form-label') }}<br />{{ form.almafield(class_='form-control') }}
         </div>
         <div class="actions">
-            <input class="btn btn-primary" type="submit" value="Update">
+            <input class="btn btn-primary mb-3" type="submit" value="Update">
         </div>
     </form>
     {% if imports|length > 0 %}
+        <h2>Previous imports</h2>
         <table class="table table-bordered table-hover table-sm report">
             <thead class="table-dark sticky-top">
                 <tr>
                     <th>Uploaded</th>
-                    <th>User</th>
-                    <th>File</th>
+                    <th>By</th>
+                    <th>CSV</th>
                     <th>Field</th>
                     <th>Status</th>
                     <th>Result</th>
@@ -35,10 +36,10 @@
                 <tr>
                     <td>{{ import.date }}</td>
                     <td>{{ import.user }}</td>
-                    <td>{{ import.filename }}</td>
+                    <td><a href="{{ uploadfolder }}/{{ import.filename }}">{{ import.filename }}</a></td>
                     <td>{{ import.field }}</td>
-                    <td></td>
-                    <td></td>
+                    <td>{{ import.status }}</td>
+                    <td><pre>{{ import.result }}</pre></td>
                 </tr>
             {% endfor %}
         </table>

@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.dialects.mysql import LONGTEXT
 from datetime import datetime
 
 db = SQLAlchemy()  # Create a database object
@@ -102,5 +101,17 @@ def add_batch_import(uuid, filename, field, user):
 
 
 def get_batch_imports():
-    batch_imports = db.session.execute(db.select(BatchImport).order_by(BatchImport.date.desc())).scalars().all()
+    batch_imports = db.session.execute(
+        db.select(
+            BatchImport.uuid,
+            BatchImport.filename,
+            BatchImport.field,
+            BatchImport.date,
+            User.displayname
+        ).join(
+            User, BatchImport.user == User.id
+        ).order_by(
+            BatchImport.date.desc()
+        )
+    ).mappings().all()
     return batch_imports

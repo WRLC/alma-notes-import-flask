@@ -138,9 +138,21 @@ def upload():
         return redirect(url_for('upload'))
 
     # Get batch imports from database
-    batch_imports = get_batch_imports()
-
-    return render_template('upload.html', form=form, imports=batch_imports)
+    batch_imports = get_batch_imports()  # Get the batch imports from the database
+    imports = []  # Initialize the imports list
+    for batch_import in batch_imports:  # Iterate through the batch imports
+        app_log.debug(celery.AsyncResult(batch_import.uuid).result)  # Log the result of the task
+        status = celery.AsyncResult(batch_import.uuid).status  # Get the status of the task
+        result = celery.AsyncResult(batch_import.uuid).result  # Get the result of the task
+        imports.append({  # Add the batch import to the imports list with the status and result
+            'filename': batch_import.filename,
+            'field': batch_import.field,
+            'date': batch_import.date,
+            'user': batch_import.displayname,
+            'status': status,
+            'result': result
+        })
+    return render_template('upload.html', form=form, imports=imports, uploadfolder=app.config['UPLOAD_FOLDER'])
 
 
 @app.route('/login')
@@ -182,6 +194,7 @@ def logout():
     return redirect(url_for('upload'))  # redirect to the home page
 
 
+# Celery task
 @celery.task
 def batch(csvfile, almafield, useremail):
     filename = csvfile.replace('static/csv', '')  # Set filename for email log
@@ -263,6 +276,7 @@ def batch(csvfile, almafield, useremail):
     return emailbody  # Return email body for testing
 
 
+# Send email
 def send_email(body, filename, useremail):
     message = email.message.Message()  # create message
     message["Subject"] = 'Results for {}'.format(filename)  # set subject
