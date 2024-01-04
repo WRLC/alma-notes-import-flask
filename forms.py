@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired
 
 # Upload Form
 class UploadForm(FlaskForm):
-    iz = SelectField('Institution Zone', coerce=str, validators=[DataRequired()])
+    iz = SelectField('Alma IZ', coerce=str, validators=[DataRequired()])
     csv = FileField('CSV File', validators=[
         FileRequired(),
         FileAllowed(['csv',], 'CSV files only!')
