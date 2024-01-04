@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, session, redirect, url_for, request, abort
 from celery import Celery
-from forms import UploadForm
+from forms import UploadForm, InstitutionForm
 from werkzeug.utils import secure_filename
 import os
 import logging
@@ -9,13 +9,14 @@ import csv
 import chardet
 import requests
 import json
-from settings import ALMA_SERVER, ALMA_API_KEY, log_dir, SECRET_APP_KEY, sender_email, smtp_address, saml_sp, \
+from settings import ALMA_SERVER, log_dir, SECRET_APP_KEY, sender_email, smtp_address, saml_sp, \
     cookie_issuing_file, institution, site_url, shared_secret, database
 import smtplib
 import email.message
 from functools import wraps
 import jwt
-from models import user_login, db, add_batch_import, check_user, get_batch_imports
+from models import user_login, db, add_batch_import, check_user, get_batch_imports, get_institutions, addinstitution, \
+    get_single_institution, Institution
 
 app = Flask(__name__)
 
@@ -93,6 +94,8 @@ def upload():
     if 'almanotesimport' not in session['authorizations']:
         abort(403)
     form = UploadForm()
+    izs = get_institutions()  # Get the institutions from the database
+    form.iz.choices = [(i.code, i.name) for i in izs]  # Set the choices for the institution field
     if form.validate_on_submit():
         # File
         file = form.csv.data  # Get the CSV file from the form
@@ -117,17 +120,20 @@ def upload():
         # Field
         field = form.almafield.data  # Get the Alma field from the form
 
+        iz = form.iz.data  # Get the institution from the form
+        apikey = get_single_institution(iz).apikey  # Get the API key for the institution
+
         user = check_user(session['username'])  # Get the current user object
 
         # Run the batch function on the CSV file
         task = batch.delay(
             os.path.join(
                 app.config['UPLOAD_FOLDER'], secfilename
-            ), field, user.emailaddress
+            ), field, user.emailaddress, apikey
         )
 
         # Add task to database
-        add_batch_import(task.id, filename, field, user.id)
+        add_batch_import(task.id, filename, field, user.id, iz)
 
         # Provide import info as message to user
         flash(
@@ -149,6 +155,7 @@ def upload():
             'field': batch_import.field,
             'date': batch_import.date,
             'user': batch_import.displayname,
+            'institution': batch_import.name,
             'status': status,
             'result': result
         })
@@ -194,9 +201,64 @@ def logout():
     return redirect(url_for('upload'))  # redirect to the home page
 
 
+# Institutions handler
+@app.route('/institutions')
+@auth_required
+def institutions():
+    if 'admin' not in session['authorizations']:
+        abort(403)
+    izs = get_institutions()
+    return render_template('institutions.html', izs=izs)
+
+
+# Institution handler
+@app.route('/institutions/<code>')
+@auth_required
+def institution(code):
+    if 'admin' not in session['authorizations']:
+        abort(403)
+    iz = code
+    app_log.debug(iz)
+    return redirect(url_for('institutions'))
+
+
+# Edit institution handler
+@app.route('/institutions/<code>/edit', methods=['GET', 'POST'])
+@auth_required
+def edit_institution(code):
+    if 'admin' not in session['authorizations']:
+        abort(403)
+    iz = Institution.query.get_or_404(code)
+    form = InstitutionForm(obj=iz)
+    if form.validate_on_submit():
+        iz.name = form.name.data
+        iz.code = form.code.data
+        db.session.commit()
+        flash(iz.name + ' updated', 'info')
+        return redirect(url_for('institutions'))
+    return render_template('edit_institution.html', form=form)
+
+
+# Add institution handler
+@app.route('/institutions/add', methods=['GET', 'POST'])
+@auth_required
+def add_institution():
+    if 'admin' not in session['authorizations']:
+        abort(403)
+    form = InstitutionForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        code = form.code.data
+        apikey = form.apikey.data
+        addinstitution(code, name, apikey)
+        flash('Institution added', 'info')
+        return redirect(url_for('institutions'))
+    return render_template('add_institution.html', form=form)
+
+
 # Celery task
 @celery.task
-def batch(csvfile, almafield, useremail):
+def batch(csvfile, almafield, useremail, key):
     filename = csvfile.replace('static/csv', '')  # Set filename for email log
     emailbody = 'Results for {}:\n'.format(filename)  # Initialize email body
     app_log.info('Processing CSV file: ' + filename)  # Log info
@@ -217,7 +279,7 @@ def batch(csvfile, almafield, useremail):
 
             try:  # Get item record from barcode via requests
                 r = requests.get(ALMA_SERVER + '/almaws/v1/items', params={
-                    'apikey': ALMA_API_KEY,
+                    'apikey': key,
                     'item_barcode': barcode,
                     'format': 'json'
                 })
@@ -246,7 +308,7 @@ def batch(csvfile, almafield, useremail):
 
             try:  # send full updated JSON item record via PUT request
                 r = requests.put(ALMA_SERVER + putendpoint, params={
-                    'apikey': ALMA_API_KEY
+                    'apikey': key
                 }, data=json.dumps(itemrec), headers=headers)
                 r.raise_for_status()  # Provide for reporting HTTP errors
 

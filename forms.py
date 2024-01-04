@@ -1,10 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField
+from wtforms import SelectField, StringField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import DataRequired
 
 
+# Upload Form
 class UploadForm(FlaskForm):
+    iz = SelectField('Institution Zone', coerce=str, validators=[DataRequired()])
     csv = FileField('CSV File', validators=[
         FileRequired(),
         FileAllowed(['csv',], 'CSV files only!')
@@ -87,3 +89,10 @@ class UploadForm(FlaskForm):
         'retention_reason',
         'retention_note'
     ], default='internal_note_1', validators=[DataRequired()])
+
+
+# Add/Edit Institution Form
+class InstitutionForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    code = StringField('Code', validators=[DataRequired()])
+    apikey = StringField('API Key', validators=[DataRequired()])

@@ -15,9 +15,20 @@ class User(db.Model):
     displayname = db.Column(db.String(255), nullable=False)
     emailaddress = db.Column(db.String(255), nullable=True)
     last_login = db.Column(db.DateTime, nullable=True)
+    admin = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+
+# Institution model
+class Institution(db.Model):
+    code = db.Column(db.String(255), primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    apikey = db.Column(db.String(255), nullable=False)
+
+    def __repr__(self):
+        return '<Institution %r>' % self.code
 
 
 # BatchImport model
@@ -28,6 +39,7 @@ class BatchImport(db.Model):
     field = db.Column(db.String(255), nullable=False)
     date = db.Column(db.DateTime, nullable=False)
     user = db.Column(db.String(255), nullable=False)
+    institution = db.Column(db.String(255), db.ForeignKey('institution.code'), nullable=False)
 
 
 ####################
@@ -48,6 +60,8 @@ def user_login(session, user_data):
     # If the user is in the database...
     if user is not None:
         set_email(user, session)  # ...set the user's email address
+        if user.admin:  # ...if the user is an admin...
+            session['authorizations'].append('admin')  # ...set the user's authorizations to ['admin']
         if 'exceptions' in session['authorizations']:
             set_last_login(user)  # ...set the last login time for the user
 
@@ -88,13 +102,14 @@ def add_user(session,):
     db.session.commit()  # Commit the changes
 
 
-def add_batch_import(uuid, filename, field, user):
+def add_batch_import(uuid, filename, field, user, institution):
     batch_import = BatchImport(
         uuid=uuid,
         filename=filename,
         field=field,
         date=datetime.now(),
         user=user,
+        institution=institution
     )
     db.session.add(batch_import)  # Add the batch import to the database
     db.session.commit()  # Commit the changes
@@ -107,11 +122,38 @@ def get_batch_imports():
             BatchImport.filename,
             BatchImport.field,
             BatchImport.date,
-            User.displayname
+            User.displayname,
+            Institution.name
         ).join(
             User, BatchImport.user == User.id
+        ).join(
+            Institution, BatchImport.institution == Institution.code
         ).order_by(
             BatchImport.date.desc()
         )
     ).mappings().all()
     return batch_imports
+
+
+def get_institutions():
+    institutions = db.session.execute(db.select(
+        Institution.code,
+        Institution.name,
+        Institution.apikey
+    ).order_by(Institution.name)).mappings().all()
+    return institutions
+
+
+def get_single_institution(code):
+    institution = db.session.execute(db.select(Institution).filter(Institution.code == code)).scalar_one_or_none()
+    return institution
+
+
+def addinstitution(code, name, apikey):
+    institution = Institution(
+        code=code,
+        name=name,
+        apikey=apikey
+    )
+    db.session.add(institution)  # Add the institution to the database
+    db.session.commit()  # Commit the changes

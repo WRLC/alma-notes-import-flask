@@ -1,6 +1,5 @@
 database = ''
 ALMA_SERVER = 'https://api-na.hosted.exlibrisgroup.com'
-ALMA_API_KEY = ''
 SECRET_APP_KEY = ''
 shared_secret = ''
 log_dir = './log'

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ form.name.data }} - Edit Institution</h1>
+    <form method="post">
+    {{ form.csrf_token }}
+        <div class="mb-3 required">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
+        </div>
+        <div class="mb-3 required">
+            {{ form.code.label(class="form-label") }}
+            {{ form.code(class="form-control", disabled=True) }}
+        </div>
+        <div class="mb-3 required">
+            {{ form.apikey.label(class="form-label") }}
+            {{ form.apikey(class="form-control") }}
+        </div>
+        <div class="actions">
+            <input type="submit" value="Update Institution"  class="btn btn-primary" />
+            <a class="btn btn-secondary" href="{{ url_for('institutions') }}">Cancel</a>
+        </div>
+    </form>
+{% endblock %}

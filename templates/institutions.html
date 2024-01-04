@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Institutions</h1>
+        <div>
+            <a href="{{ url_for('add_institution') }}" class="link-light link-underline-opacity-0 btn btn-primary">Add Institution</a>
+        </div>
+    </div>
+    <table class="table table-bordered table-hover table-sm">
+        <thead class="table-dark sticky-top">
+            <tr>
+                <th>Name</th>
+                <th>Code</th>
+                <th>API Key</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for iz in izs %}
+                <tr>
+                    <td>{{ iz.name }}</td>
+                    <td>{{ iz.code }}</td>
+                    <td>{{ iz.apikey }}</td>
+                    <td><a href="{{ url_for('edit_institution', code=iz.code) }}">Edit</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+```

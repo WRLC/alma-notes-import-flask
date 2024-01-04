@@ -5,6 +5,9 @@
     <form method="POST"  enctype="multipart/form-data">
         {{ form.csrf_token }}
         <div class="mb-3 required">
+            {{ form.iz.label(class_='form-label') }}<br />{{ form.iz(class_='form-control') }}
+        </div>
+        <div class="mb-3 required">
             {{ form.csv.label(class_='form-label') }}<br />{{ form.csv(class_='form-control') }}
         </div>
         {% if form.csv.errors %}
@@ -26,6 +29,7 @@
                 <tr>
                     <th>Uploaded</th>
                     <th>By</th>
+                    <th>IZ</th>
                     <th>CSV</th>
                     <th>Field</th>
                     <th>Status</th>
@@ -36,6 +40,7 @@
                 <tr>
                     <td>{{ import.date }}</td>
                     <td>{{ import.user }}</td>
+                    <td>{{ import.institution }}</td>
                     <td><a href="{{ uploadfolder }}/{{ import.filename }}">{{ import.filename }}</a></td>
                     <td>{{ import.field }}</td>
                     <td>{{ import.status }}</td>
