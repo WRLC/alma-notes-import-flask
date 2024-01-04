@@ -20,7 +20,7 @@ build/
 .idea/
 docs/_build/
 .vscode
-log
+log/app.log*
 *.sql
 
 # Coverage reports
