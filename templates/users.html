@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Users</h1>
+    {% if allusers|length == 0 %} }}
+        <p>No users found.</p>
+    {% else %}
+        <table class="table table-bordered table-hover table-sm">
+            <thead class="table-dark sticky-top">
+                <tr>
+                    <th>Username</th>
+                    <th>Display Name</th>
+                    <th>Email</th>
+                    <th>Admin?</th>
+                    <th>Last Login</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in allusers %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.displayname }}</td>
+                        <td>{{ user.emailaddress }}</td>
+                        <td>{{ user.admin }}</td>
+                        <td>{{ user.last_login }}</td>
+                        <td><a href="{{ url_for('edit_user', userid=user.id) }}">Edit</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

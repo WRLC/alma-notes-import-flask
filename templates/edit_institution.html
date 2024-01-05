@@ -10,7 +10,8 @@
         </div>
         <div class="mb-3 required">
             {{ form.code.label(class="form-label") }}
-            {{ form.code(class="form-control", disabled=True) }}
+            {{ form.code(class="form-control", disabled=True, ariadescribedby="codeHelpBlock") }}
+            <div id="codeHelpBlock" class="form-text">The institution code cannot be changed.</div>
         </div>
         <div class="mb-3 required">
             {{ form.apikey.label(class="form-label") }}

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, session, redirect, url_for, request, abort
 from celery import Celery
-from forms import UploadForm, InstitutionForm
+from forms import UploadForm, InstitutionForm, UserForm
 from werkzeug.utils import secure_filename
 import os
 import logging
@@ -10,13 +10,13 @@ import chardet
 import requests
 import json
 from settings import ALMA_SERVER, log_dir, SECRET_APP_KEY, sender_email, smtp_address, saml_sp, \
-    cookie_issuing_file, institution, site_url, shared_secret, database
+    cookie_issuing_file, institution_code, site_url, shared_secret, database
 import smtplib
 import email.message
 from functools import wraps
 import jwt
 from models import user_login, db, add_batch_import, check_user, get_batch_imports, get_institutions, addinstitution, \
-    get_single_institution, Institution
+    get_single_institution, Institution, get_users, User
 
 app = Flask(__name__)
 
@@ -87,6 +87,10 @@ def auth_required(f):
 
     return decorated
 
+
+##########
+# Routes #
+##########
 
 @app.route('/', methods=['GET', 'POST'])
 @auth_required
@@ -170,7 +174,7 @@ def login():
         login_url = saml_sp
         login_url += cookie_issuing_file
         login_url += '?institution='
-        login_url += institution
+        login_url += institution_code
         login_url += '&url='
         login_url += site_url
         login_url += '/login/n'
@@ -214,17 +218,6 @@ def institutions():
 # Institution handler
 @app.route('/institutions/<code>')
 @auth_required
-def institution(code):
-    if 'admin' not in session['authorizations']:
-        abort(403)
-    iz = code
-    app_log.debug(iz)
-    return redirect(url_for('institutions'))
-
-
-# Edit institution handler
-@app.route('/institutions/<code>/edit', methods=['GET', 'POST'])
-@auth_required
 def edit_institution(code):
     if 'admin' not in session['authorizations']:
         abort(403)
@@ -255,6 +248,39 @@ def add_institution():
         return redirect(url_for('institutions'))
     return render_template('add_institution.html', form=form)
 
+
+# Users handler
+@app.route('/users')
+@auth_required
+def users():
+    if 'admin' not in session['authorizations']:
+        abort(403)
+    allusers = get_users()
+    return render_template('users.html', allusers=allusers)
+
+
+# Edit User handler
+@app.route('/users/<userid>', methods=['GET', 'POST'])
+@auth_required
+def edit_user(userid):
+    if 'admin' not in session['authorizations']:
+        abort(403)
+    edituser = User.query.get_or_404(userid)
+    form = UserForm(obj=edituser)
+    if form.validate_on_submit():
+        edituser.username = form.username.data
+        edituser.displayname = form.displayname.data
+        edituser.emailaddress = form.email.data
+        edituser.admin = form.admin.data
+        db.session.commit()
+        flash(edituser.displayname + ' updated', 'info')
+        return redirect(url_for('users'))
+    return render_template('edit_user.html', form=form)
+
+
+################
+# Celery tasks #
+################
 
 # Celery task
 @celery.task
@@ -337,6 +363,10 @@ def batch(csvfile, almafield, useremail, key):
 
     return emailbody  # Return email body for testing
 
+
+####################
+# Helper functions #
+####################
 
 # Send email
 def send_email(body, filename, useremail):

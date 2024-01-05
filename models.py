@@ -157,3 +157,15 @@ def addinstitution(code, name, apikey):
     )
     db.session.add(institution)  # Add the institution to the database
     db.session.commit()  # Commit the changes
+
+
+def get_users():
+    users = db.session.execute(db.select(
+        User.id,
+        User.username,
+        User.displayname,
+        User.emailaddress,
+        User.last_login,
+        User.admin
+    ).order_by(User.username)).mappings().all()
+    return users

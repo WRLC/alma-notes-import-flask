@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ form.username.data }} - Edit</h1>
+    <form method="post">
+        {{ form.csrf_token }}
+        <div class="mb-3">
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control", disabled=True) }}
+        </div>
+        <div class="mb-3">
+            {{ form.displayname.label(class="form-label") }}
+            {{ form.displayname(class="form-control", disabled=True) }}
+        </div>
+        <div class="mb-3">
+            {{ form.emailaddress.label(class="form-label") }}
+            {{ form.emailaddress(class="form-control", disabled=True) }}
+        </div>
+        <div class="mb-3">
+            {{ form.admin.label(class="form-label") }}
+            {{ form.admin }}
+        </div>
+        <input type="submit" value="Update User"  class="btn btn-primary" />
+    </form>
+{% endblock %}
