@@ -20,6 +20,12 @@ from models import user_login, db, add_batch_import, check_user, get_batch_impor
 
 app = Flask(__name__)
 
+# set up logging to work with WSGI server
+if __name__ != '__main__':  # if running under WSGI
+    gunicorn_logger = logging.getLogger('gunicorn.error')  # get the gunicorn logger
+    app.logger.handlers = gunicorn_logger.handlers  # set the app logger handlers to the gunicorn logger handlers
+    app.logger.setLevel(gunicorn_logger.level)  # set the app logger level to the gunicorn logger level
+
 # app configuration
 app.config['SECRET_KEY'] = SECRET_APP_KEY
 app.config['SHARED_SECRET'] = shared_secret
