@@ -1,9 +1,0 @@
-01/04/2024 12:07:32 INFO     Processing CSV file: /test-5.csv
-01/04/2024 12:08:21 INFO     Import complete. 5 barcodes updated. 0 barcodes not updated.
-01/04/2024 12:08:21 INFO     Email sent to boone@wrlc.org
-01/04/2024 15:42:54 INFO     Processing CSV file: /test.csv
-01/04/2024 15:43:22 INFO     Import complete. 5 barcodes updated. 0 barcodes not updated.
-01/04/2024 15:43:22 INFO     Email sent to boone@wrlc.org
-01/04/2024 16:02:14 INFO     Processing CSV file: /test-1.csv
-01/04/2024 16:02:29 INFO     Import complete. 5 barcodes updated. 0 barcodes not updated.
-01/04/2024 16:02:30 INFO     Email sent to boone@wrlc.org
