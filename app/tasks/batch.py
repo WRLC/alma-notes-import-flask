@@ -22,6 +22,7 @@ def batch(csvfile, almafield, useremail, key):
         rownumber = 1  # Initialize row number for email log
         failed = 0  # Initialize failed row counter for email log
         success = 0  # Initialize success row counter for email log
+        current_app.logger.info('Processing CSV file: ' + filename)  # Log info
 
         for row in csv_reader:  # Iterate through each row of the CSV file
             barcode = row[0]  # Column 1 = barcode
@@ -36,6 +37,8 @@ def batch(csvfile, almafield, useremail, key):
                 r.raise_for_status()  # Provide for reporting HTTP errors
 
             except Exception as errh:  # If error...
+                current_app.logger.error('Error finding Barcode ' + str(barcode) + ' in row ' +
+                                         str(rownumber) + ': {}'.format(errh))
                 emailbody += 'Error finding Barcode ' + str(barcode) + ' in row ' + \
                              str(rownumber) + ': {}\n'.format(errh)
                 rownumber = rownumber + 1  # Bump the row number up before exiting
@@ -61,6 +64,8 @@ def batch(csvfile, almafield, useremail, key):
                 r.raise_for_status()  # Provide for reporting HTTP errors
 
             except Exception as errh:  # If error...
+                current_app.logger.error('Error updating Barcode ' + str(barcode) + ' in row ' +
+                                         str(rownumber) + ': {}'.format(errh))
                 emailbody += 'Error updating Barcode ' + str(barcode) + ' in row ' + \
                              str(rownumber) + ': {}\n'.format(errh)
                 rownumber = rownumber + 1  # Bump the row number up before exiting
@@ -102,7 +107,9 @@ def send_email(body, filename, useremail):
         smtp.quit()  # quit smtp server
     except Exception as e:  # catch exception
         message = 'Error sending email to {}: '.format(useremail) + '{}'.format(e)  # log error
+        current_app.logger.error(message)
     else:  # if no exception
         message = 'Email sent to {}'.format(useremail)  # log info
+        current_app.logger.info(message)
 
     return message  # return message for logging

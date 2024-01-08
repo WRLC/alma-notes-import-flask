@@ -10,11 +10,11 @@ class Config:
     SHARED_SECRET = os.getenv("SHARED_SECRET")
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE")  # set the database URI
     UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")  # set the upload folder
-    saml_sp = os.getenv("SAML_SP")
-    cookie_issuing_file = os.getenv("COOKIE_ISSUING_FILE")
-    institution_code = os.getenv("INSTITUTION_CODE")
-    site_url = os.getenv("SITE_URL")
-    log_dir = os.getenv("LOG_DIR")
+    SAML_SP = os.getenv("SAML_SP")
+    COOKIE_ISSUING_FILE = os.getenv("COOKIE_ISSUING_FILE")
+    INSTITUTION_CODE = os.getenv("INSTITUTION_CODE")
+    SITE_URL = os.getenv("SITE_URL")
+    LOG_DIR = os.getenv("LOG_DIR")
     ALMA_SERVER = os.getenv("ALMA_SERVER")
 
     CELERY = {

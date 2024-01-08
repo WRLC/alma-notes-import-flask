@@ -14,9 +14,12 @@ def create_app(config_class=Config):
     db.init_app(app)  # Initialize the database
 
     # Register blueprints here
+    from app.upload import bp as upload_bp  # Import the upload blueprint
+    app.register_blueprint(upload_bp)  # Register the upload blueprint
+
+    from app.models import batchimport, institution, user
     with app.app_context():
-        from app.upload import bp as upload_bp  # Import the upload blueprint
-        app.register_blueprint(upload_bp)  # Register the upload blueprint
+        db.create_all()
 
     # shell context for flask cli
     @app.shell_context_processor

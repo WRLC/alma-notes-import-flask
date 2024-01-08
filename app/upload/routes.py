@@ -19,7 +19,7 @@ def auth_required(f):
     @wraps(f)  # preserve the original function's metadata
     def decorated(*args, **kwargs):  # the wrapper function
         if 'username' not in session:  # if the user is not logged in
-            return redirect(url_for('login'))  # redirect to the login page
+            return redirect(url_for('upload.login'))  # redirect to the login page
         else:
             return f(*args, **kwargs)  # otherwise, call the original function
 
@@ -104,12 +104,12 @@ def login():
     if 'username' in session:
         return redirect(url_for('upload'))
     else:
-        login_url = current_app.config['saml_sp']
-        login_url += current_app.config['cookie_issuing_file']
+        login_url = current_app.config['SAML_SP']
+        login_url += current_app.config['COOKIE_ISSUING_FILE']
         login_url += '?institution='
-        login_url += current_app.config['institution_code']
+        login_url += current_app.config['INSTITUTION_CODE']
         login_url += '&url='
-        login_url += current_app.config['site_url']
+        login_url += current_app.config['SITE_URL']
         login_url += '/login/n'
         return render_template('login.html', login_url=login_url)
 
@@ -123,7 +123,7 @@ def new_login():
         User.user_login(session, user_data)  # Log the user in
 
         if 'almanotesimport' in session['authorizations']:  # if the user is an exceptions user
-            return redirect(url_for('upload'))  # redirect to the home page
+            return redirect(url_for('upload.upload'))  # redirect to the home page
         else:
             abort(403)  # otherwise, abort with a 403 error
     else:
@@ -135,7 +135,7 @@ def new_login():
 @auth_required
 def logout():
     session.clear()  # clear the session
-    return redirect(url_for('upload'))  # redirect to the home page
+    return redirect(url_for('upload.upload'))  # redirect to the home page
 
 
 # Institutions handler
