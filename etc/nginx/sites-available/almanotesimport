@@ -1,0 +1,9 @@
+server {
+    listen 80;
+    server_name almanotesimport.wrlc.org;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/opt/local/alma-notes-import-flask/alma-notes-import-flask.sock;
+    }
+}

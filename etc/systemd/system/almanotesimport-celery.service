@@ -1,0 +1,13 @@
+[Unit]
+Description=alma-notes-import-flask's Celery worker
+After=network.target
+
+[Service]
+User=almanotesimport
+Group=www-data
+WorkingDirectory=/opt/local/alma-notes-import-flask
+Environment="PATH=/opt/local/alma-notes-import-flask/venv/bin"
+ExecStart=/opt/local/alma-notes-import-flask/venv/bin/celery -A app.celery worker --loglevel=info
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve alma-notes-import-flask
+After=network.target
+
+[Service]
+User=almanotesimport
+Group=www-data
+WorkingDirectory=/opt/local/alma-notes-import-flask
+Environment="PATH=/opt/local/alma-notes-import-flask/venv/bin"
+ExecStart=/opt/local/alma-notes-import-flask/venv/bin/gunicorn --workers 3 --bind unix:alma-notes-import-flask.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
