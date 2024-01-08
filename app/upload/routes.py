@@ -79,7 +79,7 @@ def upload():
                 task.id) + '). An email will be sent to {} when complete.'.format(session['email']),
             'info'
         )
-        return redirect(url_for('upload'))
+        return redirect(url_for('upload.upload'))
 
     # Get batch imports from database
     batch_imports = BatchImport.get_batch_imports()  # Get the batch imports from the database
