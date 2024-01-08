@@ -14,21 +14,21 @@
                     <div class="collapse navbar-collapse" id="navbarText">
                         <ul class="navbar-nav mr-auto">
                             <li class="navbar-header">
-                                <a class="navbar-brand" href="{{ url_for('upload') }}">
+                                <a class="navbar-brand" href="{{ url_for('upload.upload') }}">
                                     <img class="logo" src="{{ url_for('static', filename='images/wrlc-logo-7-white.png') }}" alt="WRLC logo" /> WRLC Alma Notes Import
                                 </a>
                             </li>
                             {% if 'username' in session %}
                                 {% if 'admin' in session['authorizations'] %}
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ url_for('institutions') }}">Institutions</a>
+                                        <a class="nav-link" href="{{ url_for('upload.institutions') }}">Institutions</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ url_for('users') }}">Users</a>
+                                        <a class="nav-link" href="{{ url_for('upload.users') }}">Users</a>
                                     </li>
                                 {% endif %}
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                                    <a class="nav-link" href="{{ url_for('upload.logout') }}">Logout</a>
                                 </li>
                             {% endif %}
                         </ul>

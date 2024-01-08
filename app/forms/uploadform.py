@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, BooleanField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+from wtforms import SelectField
 from wtforms.validators import DataRequired
 
 
@@ -89,18 +89,3 @@ class UploadForm(FlaskForm):
         'retention_reason',
         'retention_note'
     ], default='internal_note_1', validators=[DataRequired()])
-
-
-# Add/Edit Institution Form
-class InstitutionForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    code = StringField('Code', validators=[DataRequired()])
-    apikey = StringField('API Key', validators=[DataRequired()])
-
-
-# Add/Edit User Form
-class UserForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    displayname = StringField('Display Name', validators=[DataRequired()])
-    emailaddress = StringField('Email', validators=[DataRequired()])
-    admin = BooleanField('Admin')
