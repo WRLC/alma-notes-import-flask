@@ -11,7 +11,7 @@ import email.message
 # Celery task
 @shared_task
 def batch(csvfile, almafield, useremail, key):
-    filename = csvfile.replace('static/csv', '')  # Set filename for email log
+    filename = csvfile.replace('app/static/csv/', '')  # Set filename for email log
     emailbody = 'Results for {}:\n'.format(filename)  # Initialize email body
 
     with open(csvfile) as csv_file:  # Open CSV file
