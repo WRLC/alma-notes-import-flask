@@ -31,12 +31,11 @@ def auth_required(f):
 def upload():
     if 'almanotesimport' not in session['authorizations']:
         abort(403)
-    form = uploadform.UploadForm()
+    form = uploadform.UploadForm()  # Initialize the upload form
     izs = Institution.get_institutions()  # Get the institutions from the database
     form.iz.choices = [(i.code, i.name) for i in izs]  # Set the choices for the institution field
-    current_app.logger.debug(form.iz.choices)
-    if ('scf', 'Shared Collections Facility') in form.iz.choices:  # If the SCF is in the choices...
-        form.iz.default = ('scf', 'Shared Collections Facility')  # ...set the default IZ to 'scf
+    form.iz.default = 'scf'  # Set the default institution to 'scf
+    form.iz.data = 'scf'  # Set the default institution to 'scf
     if form.validate_on_submit():
         # File
         file = form.csv.data  # Get the CSV file from the form
