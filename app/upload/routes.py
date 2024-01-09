@@ -34,6 +34,7 @@ def upload():
     form = uploadform.UploadForm()
     izs = Institution.get_institutions()  # Get the institutions from the database
     form.iz.choices = [(i.code, i.name) for i in izs]  # Set the choices for the institution field
+    current_app.logger.warning(form.iz.choices)
     if ('scf', 'Shared Collections Facility') in form.iz.choices:  # If the SCF is in the choices...
         form.iz.default = 'scf'  # ...set the default IZ to 'scf
     if form.validate_on_submit():
