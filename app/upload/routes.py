@@ -102,7 +102,7 @@ def upload():
 @bp.route('/login')
 def login():
     if 'username' in session:
-        return redirect(url_for('upload'))
+        return redirect(url_for('upload.upload'))
     else:
         login_url = current_app.config['SAML_SP']
         login_url += current_app.config['COOKIE_ISSUING_FILE']
@@ -159,7 +159,7 @@ def edit_institution(code):
     if form.validate_on_submit():
         Institution.updateinstitution(form.code.data, form.name.data, form.apikey.data)
         flash(form.name.data + ' updated', 'info')
-        return redirect(url_for('institutions'))
+        return redirect(url_for('upload.institutions'))
     return render_template('edit_institution.html', form=form)
 
 
@@ -173,7 +173,7 @@ def add_institution():
     if form.validate_on_submit():
         Institution.addinstitution(form.code.data, form.name.data, form.apikey.data)
         flash('Institution added', 'info')
-        return redirect(url_for('institutions'))
+        return redirect(url_for('upload.institutions'))
     return render_template('add_institution.html', form=form)
 
 
@@ -199,7 +199,7 @@ def edit_user(userid):
         User.updateuser(edituser.id, form.username.data, form.displayname.data, form.emailaddress.data,
                         form.admin.data)
         flash(edituser.displayname + ' updated', 'info')
-        return redirect(url_for('users'))
+        return redirect(url_for('upload.users'))
     return render_template('edit_user.html', form=form)
 
 
