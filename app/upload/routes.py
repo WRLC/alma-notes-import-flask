@@ -149,7 +149,7 @@ def institutions():
 
 
 # Institution handler
-@bp.route('/institutions/<code>')
+@bp.route('/institutions/<code>', methods=['GET', 'POST'])
 @auth_required
 def edit_institution(code):
     if 'admin' not in session['authorizations']:
