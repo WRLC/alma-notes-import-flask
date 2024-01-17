@@ -9,6 +9,7 @@
         </div>
         <div class="mb-3 required">
             {{ form.csv.label(class_='form-label') }}<br />{{ form.csv(class_='form-control') }}
+            <div class="text-muted"><small class="text-muted">CSV should not contain a header row and should have only two columns: <strong>Barcode</strong> and <strong>Field Value.</strong></small></div>
         </div>
         {% if form.csv.errors %}
             {% for error in form.csv.errors %}
