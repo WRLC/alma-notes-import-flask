@@ -35,7 +35,6 @@ def upload():
     izs = Institution.get_institutions()  # Get the institutions from the database
     form.iz.choices = [(i.code, i.name) for i in izs]  # Set the choices for the institution field
     form.iz.default = 'scf'  # Set the default institution to 'scf
-    form.iz.data = 'scf'  # Set the default institution to 'scf
     if form.validate_on_submit():
         # File
         file = form.csv.data  # Get the CSV file from the form
