@@ -50,7 +50,29 @@ def batch(csvfile, almafield, useremail, key):
             current_app.logger.debug('Barcode {} found.'.format(barcode))
 
             itemrec = r.json()  # If request good, parse JSON into a variable
-            itemrec['item_data'][almafield] = note  # Insert column 2 value into the destination field
+            if almafield in value_desc_fields:
+
+                if '|' in note:
+                    note = note.split('|')
+                    itemrec['item_data'][almafield] = {
+                        'value': note[0],
+                        'desc': note[1]
+                    }
+
+                else:
+                    current_app.logger.error('Error updating Barcode ' + str(barcode) + ' in row ' + str(rownumber) +
+                                             ': ' + almafield + ' is a value-description field requiring a value \
+                                             and a description separated by a pipe (|).')
+                    emailbody += 'Error updating Barcode ' + str(barcode) + ' in row ' + str(rownumber) + ': ' + \
+                        almafield + ' is a value-description field requiring a value and a description separated by a \
+                        pipe (|).\n'
+                    rownumber = rownumber + 1  # Bump the row number up before exiting
+                    failed = failed + 1
+                    continue  # Stop processing this row
+            elif almafield in value_fields:
+                itemrec['item_data'][almafield] = {'value': note}
+            else:
+                itemrec['item_data'][almafield] = note  # Insert column 2 value into the destination field
             headers = {'content-type': 'application/json'}  # Specify JSON content type for PUT request
 
             # Get IDs from item record for building PUT request endpoint
@@ -120,3 +142,23 @@ def send_email(body, filename, useremail):
         current_app.logger.info(message)
 
     return message  # return message for logging
+
+
+value_fields = [
+    'provenance',
+    'break_indicator',
+    'pattern_type',
+    'alternative_call_number_type',
+    'physical_condition',
+    'committed_to_retain',
+    'retention_reason',
+    'process_type',
+]
+
+value_desc_fields = [
+    'policy',
+    'library',
+    'location',
+    'base_status',
+    'physical_material_type',
+]
