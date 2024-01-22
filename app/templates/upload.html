@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Batch update Alma field by barcode</h1>
+    <h1 class="mb-3">Batch update Alma field by barcode</h1>
+    <div class="text-muted mb-2">
+        <small>Alma has defined a list of valid values for some fields. This app does <strong>NOT</strong> check whether the values in your CSV match these defined values before attempting to update them in Alma.</small>
+    </div>
+    <div class="text-muted mb-3">
+        <small>If a value isn't valid, it will result in a <strong>400 Bad Request</strong> error for that barcode.</small>
+    </div>
     <form method="POST"  enctype="multipart/form-data">
         {{ form.csrf_token }}
         <div class="mb-3 required">
@@ -16,16 +22,26 @@
                 <div class="alert alert-danger" role="alert">{{ error }}</div>
             {% endfor %}
         {% endif %}
-        <div class="mb-3 required">
+        <div class="mb-4 required">
             {{ form.almafield.label(class_='form-label') }}<br />{{ form.almafield(class_='form-control') }}
+            <div class="text-muted">
+                <small class="text-muted">When selecting the following fields, values in the CSV's second column should include a <strong>Value</strong> and <strong>Description</strong> separated by a pipe ('|'):</small>
+                    <ul>
+                        <li><small>policy</small></li>
+                        <li><small>library</small></li>
+                        <li><small>location</small></li>
+                        <li><small>base_status</small></li>
+                        <li><small>physical_material_type</small></li>
+                    </ul>
+            </div>
         </div>
         <div class="actions">
-            <input class="btn btn-primary mb-3" type="submit" value="Update">
+            <input class="btn btn-primary mb-4" type="submit" value="Batch Update">
         </div>
     </form>
     {% if imports|length > 0 %}
-        <h2>Import History</h2>
-        <table class="table table-bordered table-hover table-sm report small">
+        <h2 class="mb-3">Import History</h2>
+        <table class="table table-bordered table-hover table-sm report">
             <thead class="table-dark sticky-top">
                 <tr>
                     <th>Uploaded</th>

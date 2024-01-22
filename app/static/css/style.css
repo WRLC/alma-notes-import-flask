@@ -37,3 +37,8 @@
     content: " *";
     color: var(--bs-danger);
 }
+
+td pre {
+    max-width: 600px;
+    overflow: scroll;
+}
