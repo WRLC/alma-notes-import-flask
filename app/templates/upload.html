@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    {% set path = uploadfolder|replace('app/', '') %}
     <h1 class="mb-3">Batch update Alma field by barcode</h1>
     <div class="text-muted mb-2">
         <small>Alma has defined a list of valid values for some fields. This app does <strong>NOT</strong> check whether the values in your CSV match these defined values before attempting to update them in Alma.</small>
@@ -58,7 +59,7 @@
                     <td>{{ import.date }}</td>
                     <td>{{ import.user }}</td>
                     <td>{{ import.institution }}</td>
-                    <td><a href="{{ uploadfolder }}/{{ import.filename }}">{{ import.filename }}</a></td>
+                    <td><a href="/{{ path }}/{{ import.filename }}">{{ import.filename }}</a></td>
                     <td>{{ import.field }}</td>
                     <td>{{ import.status }}</td>
                     <td><pre>{{ import.result }}</pre></td>
