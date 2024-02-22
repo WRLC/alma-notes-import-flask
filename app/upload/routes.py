@@ -86,7 +86,6 @@ def upload():
     batch_imports = BatchImport.get_batch_imports()  # Get the batch imports from the database
     imports = []  # Initialize the imports list
     for batch_import in batch_imports:  # Iterate through the batch imports
-        status = AsyncResult(batch_import.uuid).status  # Get the status of the task
         result = AsyncResult(batch_import.uuid).result  # Get the result of the task
         imports.append({  # Add the batch import to the imports list with the status and result
             'filename': batch_import.filename,
@@ -94,7 +93,6 @@ def upload():
             'date': batch_import.date,
             'user': batch_import.displayname,
             'institution': batch_import.name,
-            'status': status,
             'result': result
         })
     return render_template('upload.html', form=form, imports=imports, uploadfolder=current_app.config['UPLOAD_FOLDER'])

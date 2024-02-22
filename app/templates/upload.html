@@ -50,7 +50,6 @@
                     <th>IZ</th>
                     <th>CSV</th>
                     <th>Field</th>
-                    <th>Status</th>
                     <th>Result</th>
                 </tr>
             </thead>
@@ -61,7 +60,6 @@
                     <td>{{ import.institution }}</td>
                     <td><a href="/{{ path }}/{{ import.filename }}">{{ import.filename }}</a></td>
                     <td>{{ import.field }}</td>
-                    <td>{{ import.status }}</td>
                     <td><pre>{{ import.result }}</pre></td>
                 </tr>
             {% endfor %}
