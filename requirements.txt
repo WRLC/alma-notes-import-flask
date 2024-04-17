@@ -17,7 +17,7 @@ Flask-CeleryExt==0.5.0
 Flask-SQLAlchemy==3.1.1
 Flask-WTF==1.2.1
 greenlet==3.0.3
-gunicorn==21.2.0
+gunicorn==22.0.0
 idna==3.7
 importlib-metadata==7.0.1
 itsdangerous==2.1.2
