@@ -17,11 +17,18 @@ class User(db.Model):
     # Log the user into the app
     @staticmethod
     def user_login(session, user_data):
+        # Assemble to user's display name
+        user_data['DisplayName'] = ''  # Initialize the display name
+        if 'GivenName' in user_data:  # if the user has a first name...
+            user_data['DisplayName'] += user_data['GivenName'] + ' '  # ...set the first name
+        if 'Name' in user_data:
+            user_data['DisplayName'] += user_data['Name']
+
         # Set the session variables
-        session['username'] = user_data['primary_id']  # Set the username
-        session['display_name'] = user_data['full_name']  # Set the user's display name
-        session['authorizations'] = user_data['authorizations']  # Set the user's authorizations
-        session['email'] = user_data['email']  # Set the user's email
+        session['username'] = user_data['UserName']  # Set the username
+        session['display_name'] = user_data['DisplayName']  # Set the user's display name
+        session['email'] = user_data['Email']  # Set the user's email
+        session['authorizations'] = []  # Initialize the user's authorizations
 
         user = User.check_user(session['username'])  # Check if the user exists in the database
 
@@ -30,8 +37,6 @@ class User(db.Model):
             User.set_email(user, session)  # ...set the user's email address
             if user.admin:  # ...if the user is an admin...
                 session['authorizations'].append('admin')  # ...set the user's authorizations to ['admin']
-            if 'exceptions' in session['authorizations']:
-                User.set_last_login(user)  # ...set the last login time for the user
 
         # If the user isn't in the database...
         else:
