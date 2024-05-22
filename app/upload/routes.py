@@ -12,6 +12,9 @@ from app.models.user import User
 from app.models.institution import Institution
 from app.models.batchimport import BatchImport
 from app.upload import bp
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # decorator for pages that need auth
@@ -113,8 +116,8 @@ def login():
 def new_login():
     session.clear()
     if 'AladinSessionAlmaNotesImport' in request.cookies:
-        memcached_key = request.cookies['AladinSessionAlmaNotesImport']
-        memcached = memcacheClient(('aladin-memcached', 11211))
+        memcached_key = request.cookies[os.getenv('COOKIE_NAME')]
+        memcached = memcacheClient((os.getenv('memcached_server'), 11211))
         user_data = {}
         for line in memcached.get(memcached_key).decode('utf-8').splitlines():
             key, value = line.split('=')
