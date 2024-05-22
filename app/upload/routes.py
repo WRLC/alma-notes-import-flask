@@ -117,7 +117,7 @@ def new_login():
     session.clear()
     if 'AladinSessionAlmaNotesImport' in request.cookies:
         memcached_key = request.cookies[os.getenv('COOKIE_NAME')]
-        memcached = memcacheClient((os.getenv('memcached_server'), 11211))
+        memcached = memcacheClient((os.getenv('MEMCACHED_SERVER'), 11211))
         user_data = {}
         for line in memcached.get(memcached_key).decode('utf-8').splitlines():
             key, value = line.split('=')
