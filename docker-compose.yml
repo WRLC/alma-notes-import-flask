@@ -1,28 +1,30 @@
-version: "3"
-
 services:
-  python:
+  almanotesimport:
     build: .
+    container_name: almanotesimport
     volumes:
       - .:/app
     working_dir: /app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nginx.rule=Host(`almanotesimport.wrlc.localhost`)"
-      - "traefik.http.routers.nginx.tls=true"
-      - "traefik.http.routers.nginx.entrypoints=websecure"
+      - "traefik.http.routers.almanotesimport.rule=Host(`almanotesimport.wrlc.localhost`)"
+      - "traefik.http.routers.almanotesimport.tls=true"
+      - "traefik.http.routers.almanotesimport.entrypoints=websecure"
+    depends_on:
+      - almanotesimport_db
     networks:
       - proxy
 
-  mysql:
+  almanotesimport_db:
     image: mariadb:latest
+    container_name: almanotesimport_db
     environment:
       MARIADB_ROOT_PASSWORD: root
       MYSQL_DATABASE: mydb
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
-      - "8301:3306"
+      - "3323:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     networks:

@@ -1,4 +1,5 @@
 from flask import render_template, flash, redirect, url_for, session, current_app, request, abort
+from pymemcache.client.base import Client as memcacheClient
 import app.forms.uploadform as uploadform
 import app.forms.institutionform as institutionform
 import app.forms.userform as userform
@@ -7,7 +8,6 @@ from werkzeug.utils import secure_filename
 from app.tasks.batch import batch
 from celery.result import AsyncResult
 import os
-import jwt
 from app.models.user import User
 from app.models.institution import Institution
 from app.models.batchimport import BatchImport
@@ -29,8 +29,6 @@ def auth_required(f):
 @bp.route('/', methods=['GET', 'POST'])
 @auth_required
 def upload():
-    if 'almanotesimport' not in session['authorizations']:
-        abort(403)
     form = uploadform.UploadForm()  # Initialize the upload form
     izs = Institution.get_institutions()  # Get the institutions from the database
     form.iz.choices = [(i.code, i.name) for i in izs]  # Set the choices for the institution field
@@ -107,24 +105,22 @@ def login():
         login_url += current_app.config['COOKIE_ISSUING_FILE']
         login_url += '?institution='
         login_url += current_app.config['INSTITUTION_CODE']
-        login_url += '&url='
-        login_url += current_app.config['SITE_URL']
-        login_url += '/login/n'
+        login_url += '&service=alma_notes_import'
         return render_template('login.html', login_url=login_url)
 
 
 @bp.route('/login/n')
 def new_login():
     session.clear()
-    if 'wrt' in request.cookies:  # if the login cookie is present
-        encoded_token = request.cookies['wrt']  # get the login cookie
-        user_data = jwt.decode(encoded_token, current_app.config['SHARED_SECRET'], algorithms=['HS256'])  # decode token
+    if 'AladinSessionAlmaNotesImport' in request.cookies:
+        memcached_key = request.cookies['AladinSessionAlmaNotesImport']
+        memcached = memcacheClient(('aladin-memcached', 11211))
+        user_data = {}
+        for line in memcached.get(memcached_key).decode('utf-8').splitlines():
+            key, value = line.split('=')
+            user_data[key] = value
         User.user_login(session, user_data)  # Log the user in
-
-        if 'almanotesimport' in session['authorizations']:  # if the user is an exceptions user
-            return redirect(url_for('upload.upload'))  # redirect to the home page
-        else:
-            abort(403)  # otherwise, abort with a 403 error
+        return redirect(url_for('upload.upload'))  # Redirect to the upload page
     else:
         return "no login cookie"  # if the login cookie is not present, return an error
 
