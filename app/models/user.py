@@ -62,7 +62,7 @@ class User(db.Model):
 
     # Add the user to the database
     @staticmethod
-    def add_user(session, ):
+    def add_user(session):
 
         # Create the user object
         user = User(
