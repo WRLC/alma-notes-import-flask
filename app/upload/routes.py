@@ -108,7 +108,8 @@ def login():
         login_url += current_app.config['COOKIE_ISSUING_FILE']
         login_url += '?institution='
         login_url += current_app.config['INSTITUTION_CODE']
-        login_url += '&service=alma_notes_import'
+        login_url += '&service='
+        login_url += current_app.config['SERVICE_SLUG']
         return render_template('login.html', login_url=login_url)
 
 
