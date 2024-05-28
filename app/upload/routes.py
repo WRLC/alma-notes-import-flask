@@ -115,9 +115,11 @@ def login():
 @bp.route('/login/n')
 def new_login():
     session.clear()
-    if 'AladinSessionAlmaNotesImport' in request.cookies:
-        memcached_key = request.cookies[os.getenv('COOKIE_NAME')]
-        memcached = memcacheClient((os.getenv('MEMCACHED_SERVER'), 11211))
+    cookie_name = current_app.config['COOKIE_PREFIX'] + current_app.config['SERVICE_SLUG']
+    memcached_server = current_app.config['MEMCACHED_SERVER']
+    if cookie_name in request.cookies:
+        memcached_key = request.cookies[cookie_name]
+        memcached = memcacheClient((memcached_server, 11211))
         user_data = {}
         for line in memcached.get(memcached_key).decode('utf-8').splitlines():
             key, value = line.split('=')
