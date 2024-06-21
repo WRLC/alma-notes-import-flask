@@ -17,6 +17,7 @@ class Config:
     SITE_URL = os.getenv("SITE_URL")
     SAML_SP = os.getenv("SAML_SP")
     COOKIE_ISSUING_FILE = os.getenv("COOKIE_ISSUING_FILE")
+    LOGOUT_SCRIPT = os.getenv("LOGOUT_SCRIPT")
     COOKIE_PREFIX = os.getenv("COOKIE_PREFIX")
     SERVICE_SLUG = os.getenv("SERVICE_SLUG")
     MEMCACHED_SERVER = os.getenv("MEMCACHED_SERVER")
