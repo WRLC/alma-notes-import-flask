@@ -136,7 +136,11 @@ def new_login():
 @auth_required
 def logout():
     session.clear()  # clear the session
-    return redirect(url_for('upload.upload'))  # redirect to the home page
+    return redirect(  # redirect to the logout script
+        current_app.config['SAML_SP'] +
+        current_app.config['LOGOUT_SCRIPT'] +
+        '?service=' +
+        current_app.config['SERVICE_SLUG'])
 
 
 # Institutions handler
