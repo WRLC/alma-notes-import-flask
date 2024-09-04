@@ -26,7 +26,7 @@ kombu==5.4.0
 MarkupSafe==2.1.5
 packaging==24.1
 prompt_toolkit==3.0.47
-pycparser==2.21
+pycparser==2.22
 PyJWT==2.8.0
 pymemcache==4.0.0
 PyMySQL==1.1.1
