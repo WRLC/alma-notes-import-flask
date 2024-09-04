@@ -34,7 +34,7 @@ pyOpenSSL==24.2.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 redis==5.0.8
-requests==2.32.0
+requests==2.32.3
 six==1.16.0
 SQLAlchemy==2.0.25
 typing_extensions==4.9.0
