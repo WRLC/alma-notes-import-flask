@@ -24,7 +24,7 @@ itsdangerous==2.2.0
 Jinja2==3.1.4
 kombu==5.4.0
 MarkupSafe==2.1.5
-packaging==23.2
+packaging==24.1
 prompt-toolkit==3.0.43
 pycparser==2.21
 PyJWT==2.8.0
