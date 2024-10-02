@@ -25,7 +25,7 @@ Jinja2==3.1.4
 kombu==5.4.2
 MarkupSafe==2.1.5
 packaging==24.1
-prompt_toolkit==3.0.47
+prompt_toolkit==3.0.48
 pycparser==2.22
 PyJWT==2.9.0
 pymemcache==4.0.0
