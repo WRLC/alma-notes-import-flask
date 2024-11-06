@@ -23,7 +23,7 @@ importlib_metadata==8.5.0
 itsdangerous==2.2.0
 Jinja2==3.1.4
 kombu==5.4.2
-MarkupSafe==2.1.5
+MarkupSafe==3.0.2
 packaging==24.1
 prompt_toolkit==3.0.48
 pycparser==2.22
