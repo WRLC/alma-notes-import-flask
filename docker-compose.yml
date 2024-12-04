@@ -2,6 +2,8 @@ services:
   almanotesimport:
     build: .
     container_name: almanotesimport
+    environment:
+      FLASK_DEBUG: 1
     volumes:
       - .:/app
     working_dir: /app
