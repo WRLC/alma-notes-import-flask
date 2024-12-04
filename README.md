@@ -34,6 +34,8 @@ git commit -m "Update packages"  # commit changes
 git push -u origin update/<YYYY-MM-DD>  # push changes to GitHub
 ```
 
+Then create a pull request on GitHub and merge the changes.
+
 ## Deploying updates to production
 
 ```bash
