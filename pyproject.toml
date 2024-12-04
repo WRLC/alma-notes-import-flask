@@ -1,9 +1,5 @@
 [tool.poetry]
-name = "alma-notes-import-flask"
-version = "0.1.0"
-description = "Flask app for batch updating fields in Alma item records by barcode from a CSV file"
-authors = ["WRLC"]
-readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
