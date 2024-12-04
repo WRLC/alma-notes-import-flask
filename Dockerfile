@@ -19,6 +19,7 @@ COPY ./pyproject.toml ./poetry.lock /app/
 RUN pipx install black
 RUN pipx install isort
 
+
 # Install poetry
 RUN pipx install poetry && \
     poetry lock --no-update && \
@@ -33,6 +34,4 @@ RUN poetry install --no-root
 # Copy in the rest of the files:
 COPY . /app
 
-RUN export FLASK_DEBUG=1
-
-CMD ["poetry", "run", "gunicorn", "wsgi:app", "-b", "0.0.0.0:5000", "--workers=4"]
+CMD ["poetry", "run", "/root/.cache/pypoetry/virtualenvs/alma-notes-import-flask-9TtSrW0h-py3.12/bin/gunicorn", "wsgi:app", "-b", "0.0.0.0:5000", "--workers=4"]
