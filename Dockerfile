@@ -1,37 +1,24 @@
 FROM python:3.12-slim
 
-# Install pipx
-RUN python3 -m pip install --upgrade pipx
+RUN apt update &&  apt install -y gcc git
 
-# Set environment variables for pipx
-ENV PIPX_BIN_DIR=/opt/pipx/bin
-ENV PIPX_HOME=/opt/pipx/home
-ENV PATH=${PIPX_BIN_DIR}:${PATH}
+RUN pip install poetry
 
-# Set the working directory:
+RUN python -m venv /opt/.venv
+ENV PATH="/opt/.venv/bin:$PATH" VIRTUAL_ENV="/opt/.venv"
+
 RUN mkdir /app
+COPY pyproject.toml poetry.lock /app/
 WORKDIR /app
 
-# Copy in the python prereq files:
-COPY ./pyproject.toml ./poetry.lock /app/
+RUN poetry lock --no-update && poetry install --no-root
 
-# Install packages using pipx
-RUN pipx install black
-RUN pipx install isort
-
-
-# Install poetry
-RUN pipx install poetry && \
-    poetry lock --no-update && \
-    poetry config virtualenvs.create false
-
-# Expose the port that the app runs on:
 EXPOSE 5000
 
-# Install only python dependencies (skipping dev libraries):
-RUN poetry install --no-root
+RUN mkdir /root/.ssh
+RUN ln -s /run/secrets/ssh_key /root/.ssh/id_rsa
+RUN ln -s /run/secrets/gitconfig /root/.gitconfig
 
-# Copy in the rest of the files:
-COPY . /app
 
-CMD ["poetry", "run", "/root/.cache/pypoetry/virtualenvs/alma-notes-import-flask-9TtSrW0h-py3.12/bin/gunicorn", "wsgi:app", "-b", "0.0.0.0:5000", "--workers=4"]
+ENTRYPOINT ["poetry", "run", "flask", "run", "--debug", "--host", "0.0.0.0", "--port", "5000"]
+# CMD tail -f /dev/null
