@@ -5,9 +5,26 @@ After=network.target
 [Service]
 User=almanotesimport
 Group=www-data
-WorkingDirectory=/opt/local/alma-notes-import-flask
-Environment="PATH=/home/almanotesimport/.cache/pypoetry/virtualvenvs/name-of-venv/bin"
-ExecStart=/home/almanotesimport/.cache/pypoetry/virtualvenvs/name-of-venv/bin/gunicorn --workers 3 --bind unix:alma-notes-import-flask.sock -m 007 wsgi:app
+WorkingDirectory=/path/to/alma-notes-import-flask
+Environment="PATH=/path/to/venv/bin"
+Environment="DATABASE="
+Environment="SECRET_APP_KEY="
+Environment="SHARED_SECRET="
+Environment="LOG_DIR=app/log"
+Environment="LOG_LEVEL="
+Environment="ALMA_SERVER="
+Environment="SMTP_ADDRESS="
+Environment="SENDER_EMAIL="
+Environment="SITE_URL="
+Environment="SAML_SP="
+Environment="COOKIE_ISSUING_FILE=/login"
+Environment="LOGOUT_SCRIPT=/logout"
+Environment="COOKIE_PREFIX=_wr_"
+Environment="SERVICE_SLUG=alma_notes_import"
+Environment="MEMCACHED_SERVER="
+Environment="INSTITUTION_CODE="
+Environment="UPLOAD_FOLDER=app/static/csv"
+ExecStart=/path/to/venv/bin/gunicorn --workers 3 --bind unix:alma-notes-import-flask.sock -m 007 wsgi:app
 
 [Install]
 WantedBy=multi-user.target
