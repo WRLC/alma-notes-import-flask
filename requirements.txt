@@ -25,7 +25,7 @@ Jinja2==3.1.5
 kombu==5.4.2
 MarkupSafe==3.0.2
 packaging==24.2
-prompt_toolkit==3.0.48
+prompt_toolkit==3.0.50
 pycparser==2.22
 PyJWT==2.10.1
 pymemcache==4.0.0
@@ -36,7 +36,7 @@ python-dotenv==1.0.1
 redis==5.2.1
 requests==2.32.3
 six==1.17.0
-SQLAlchemy==2.0.36
+SQLAlchemy==2.0.37
 typing_extensions==4.12.2
 tzdata==2024.2
 urllib3==2.3.0
