@@ -11,7 +11,7 @@ click==8.1.8
 click-didyoumean==0.3.1
 click-plugins==1.1.1
 click-repl==0.3.0
-cryptography==44.0.1
+cryptography==44.0.2
 Flask==3.1.0
 Flask-CeleryExt==0.5.0
 Flask-SQLAlchemy==3.1.1
@@ -21,7 +21,7 @@ gunicorn==23.0.0
 idna==3.10
 importlib_metadata==8.6.1
 itsdangerous==2.2.0
-Jinja2==3.1.5
+Jinja2==3.1.6
 kombu==5.4.2
 MarkupSafe==3.0.2
 packaging==24.2
@@ -36,7 +36,7 @@ python-dotenv==1.0.1
 redis==5.2.1
 requests==2.32.3
 six==1.17.0
-SQLAlchemy==2.0.37
+SQLAlchemy==2.0.38
 typing_extensions==4.12.2
 tzdata==2025.1
 urllib3==2.3.0
