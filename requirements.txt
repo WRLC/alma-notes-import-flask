@@ -37,7 +37,7 @@ redis==5.2.1
 requests==2.32.3
 six==1.17.0
 SQLAlchemy==2.0.40
-typing_extensions==4.12.2
+typing_extensions==4.13.0
 tzdata==2025.2
 urllib3==2.3.0
 vine==5.1.0
