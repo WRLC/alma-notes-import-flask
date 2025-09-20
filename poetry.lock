@@ -832,14 +832,14 @@ wcwidth = "*"
 
 [[package]]
 name = "pycparser"
-version = "2.22"
+version = "2.23"
 description = "C parser in Python"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "pycparser-2.22-py3-none-any.whl", hash = "sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"},
-    {file = "pycparser-2.22.tar.gz", hash = "sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6"},
+    {file = "pycparser-2.23-py3-none-any.whl", hash = "sha256:e5c6e8d3fbad53479cab09ac03729e0a9faf2bee3db8208a550daf5af81a5934"},
+    {file = "pycparser-2.23.tar.gz", hash = "sha256:78816d4f24add8f10a06d6f05b4d424ad9e96cfebf68a4ddc99c65c0720d00c2"},
 ]
 
 [[package]]
@@ -890,18 +890,18 @@ rsa = ["cryptography"]
 
 [[package]]
 name = "pyopenssl"
-version = "25.1.0"
+version = "25.2.0"
 description = "Python wrapper module around the OpenSSL library"
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "pyopenssl-25.1.0-py3-none-any.whl", hash = "sha256:2b11f239acc47ac2e5aca04fd7fa829800aeee22a2eb30d744572a157bd8a1ab"},
-    {file = "pyopenssl-25.1.0.tar.gz", hash = "sha256:8d031884482e0c67ee92bf9a4d8cceb08d92aba7136432ffb0703c5280fc205b"},
+    {file = "pyopenssl-25.2.0-py3-none-any.whl", hash = "sha256:8a3d87605158baffa5d35d097539b2221908f7b15c3ee03c99cdd49e79a7d5ae"},
+    {file = "pyopenssl-25.2.0.tar.gz", hash = "sha256:71db4c6a4badb88b9804ade80886dc19b7eec3678a4a23c9029f97024c65191a"},
 ]
 
 [package.dependencies]
-cryptography = ">=41.0.5,<46"
+cryptography = ">=45.0.7,<46"
 typing-extensions = {version = ">=4.9", markers = "python_version < \"3.13\" and python_version >= \"3.8\""}
 
 [package.extras]
@@ -1213,4 +1213,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "3a2fbf81a2666be78f13ea9e540b67fd74292767373ab4c1b0134ffe50dcd923"
+content-hash = "5cc9a6566e44497f9cefbb07a86ea55107586f88bae1331eda3ecc9aad8d5052"
